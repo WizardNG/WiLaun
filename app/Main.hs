@@ -1,4 +1,11 @@
 module Main where
 
+import ReadMenu
+import OpenMenu
+import Execution
+
 main :: IO ()
-main = putStrLn "Hello, Haskell!"
+main = do 
+    let menu = readMenu
+    let comm = openMenu menu
+    executeCommand comm
