@@ -21,11 +21,17 @@ data Submenu = Submenu { name :: String
 
 data MenuPunkt = Item MenuItem | SubLevel Submenu deriving (Show, Eq)
 
-data Menu = Menu [MenuPunkt] deriving (Show, Eq)
+newtype Menu = Menu [MenuPunkt] deriving (Show, Eq)
 
 readMenu :: Menu
-readMenu = Menu $ (SubLevel $ Submenu "System"  (Menu []))
-                   : (SubLevel $ Submenu "User" (Menu ((Item $ MenuItem "Telegram" "Telegram")
-                                              :[])
-                      )) 
-                   : []
+readMenu = Menu $ readSystemComponent ++ readUserComponent
+
+
+readSystemComponent :: [MenuPunkt]
+readSystemComponent = [SubLevel (Submenu "System"  (Menu []))]
+
+readUserComponent :: [MenuPunkt]
+readUserComponent = [SubLevel  
+                            (Submenu "User" (Menu 
+                                        [Item (MenuItem "Telegram" "Telegram")]
+                      ))]
