@@ -19,6 +19,7 @@ import System.Directory
 import Data.List 
 import Data.Functor
 import Util
+import Control.Monad
 
 import FileControl
 
@@ -64,4 +65,12 @@ readFileList path fltr = do
     let l3 = map (path </>) l2
     return l3 
 
+--readAppList :: FilePath -> ([FilePath] -> IO [FilePath]) -> IO [FilePath]
+readAppList :: FilePath -> IO [FilePath]
+readAppList path = do 
+    --f <-  getDirectoryContents path 
+    f <- listDirectory path 
+    fltrExec $ map (path </>) f
 
+fltrExec :: [FilePath] -> IO [FilePath]
+fltrExec = filterM isExec 

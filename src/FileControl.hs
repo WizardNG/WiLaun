@@ -27,9 +27,10 @@ isExec fp = do
     fm <- fileMode <$> getFileStatus fp
     own <- isOwner fp
     grp <- isGroup fp
-    let ex =   (own &&checkMode fm ownerExecuteMode) 
+    let ex =  ((own &&checkMode fm ownerExecuteMode) 
             || (grp &&checkMode fm groupExecuteMode)
-            || checkMode fm otherExecuteMode
+            || checkMode fm otherExecuteMode)
+            && not (checkMode fm directoryMode)
     return ex
 
 isRead :: FilePath  -> IO Bool
@@ -37,9 +38,10 @@ isRead fp = do
     fm <- fileMode <$> getFileStatus fp
     own <- isOwner fp
     grp <- isGroup fp
-    let ex =   (own &&checkMode fm ownerReadMode) 
+    let ex =  ((own &&checkMode fm ownerReadMode) 
             || (grp &&checkMode fm groupReadMode)
-            || checkMode fm otherReadMode
+            || checkMode fm otherReadMode)
+            && not (checkMode fm directoryMode)
     return ex
 
 isWrite :: FilePath  -> IO Bool
@@ -47,8 +49,9 @@ isWrite fp = do
     fm <- fileMode <$> getFileStatus fp
     own <- isOwner fp
     grp <- isGroup fp
-    let ex =   (own &&checkMode fm ownerWriteMode) 
+    let ex =  ((own &&checkMode fm ownerWriteMode) 
             || (grp &&checkMode fm groupWriteMode)
-            || checkMode fm otherWriteMode
+            || checkMode fm otherWriteMode)
+            && not (checkMode fm directoryMode)
     return ex
 
