@@ -6,6 +6,7 @@ import Execution
 
 main :: IO ()
 main = do 
-    let menu = readMenu
+    --let menu = readMenu
+    menu <- readMenu
     let comm = openMenu menu
     executeCommand comm

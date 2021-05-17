@@ -1,4 +1,4 @@
-{-# LANGUAGE TypeSynonymInstances #-}
+--{-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE ConstrainedClassMethods #-}
@@ -6,9 +6,12 @@
 module ReadMenu (
                   MenuItem (..)
                 , Submenu (..)
-                , MenuPunkt (..)
+                , MenuElement (..)
                 , Menu (..)
                 , readMenu
+                , readSystemComponent
+                , readPath
+                , readSystemItems
                 ) where
 
 import System.IO
@@ -17,32 +20,40 @@ import System.FilePath.Posix
 import System.Directory
 
 import Data.List 
+import Data.List.Extra
 import Data.Functor
 import Util
 import Control.Monad
 
 import FileControl
 
+-- | Type of elementary menu item 
 data MenuItem = MenuItem { name :: String
                          , action :: String}
                          deriving (Show, Eq)
 
+-- | Type of menu sublevel
 data Submenu = Submenu { name :: String
                        , sub :: Menu}
                        deriving (Show, Eq)
 
-data MenuPunkt = Item MenuItem | SubLevel Submenu deriving (Show, Eq)
+-- | Type of base menu element: item or sublevel menu
+data MenuElement = Item MenuItem | SubLevel Submenu deriving (Show, Eq)
 
-newtype Menu = Menu [MenuPunkt] deriving (Show, Eq)
+newtype Menu = Menu [MenuElement] deriving (Show, Eq)
 
-readMenu :: Menu
-readMenu = Menu $ readSystemComponent ++ readUserComponent
+readMenu :: IO Menu
+readMenu = pure $ Menu []
+--readMenu = pure $ Menu $ readSystemComponent ++ readUserComponent
 
 
-readSystemComponent :: [MenuPunkt]
-readSystemComponent = [SubLevel (Submenu "System"  (Menu []))]
+readSystemComponent :: IO [MenuElement]
+readSystemComponent = do
+    p <- readPath
+    l <- traverse readSystemItems p
+    pure [SubLevel (Submenu "System"  $ Menu l )]
 
-readUserComponent :: [MenuPunkt]
+readUserComponent :: [MenuElement]
 readUserComponent = [SubLevel  
                             (Submenu "User" (Menu 
                                         [Item (MenuItem "Telegram" "Telegram")]
@@ -55,22 +66,22 @@ parsePath :: Maybe String -> [FilePath]
 parsePath Nothing = []
 parsePath (Just a) = splitSearchPath a
 
-readFiles :: FilePath -> [MenuPunkt]
-readFiles _ = []
+readSystemItems :: FilePath -> IO MenuElement
+readSystemItems p = do 
+    f <- listDirectory p 
+    me <- filterMenu [Item $ MenuItem x (p </> x) | x<-f]
+    pure $ SubLevel $ Submenu p (Menu me)
 
-readFileList :: FilePath -> ([FilePath] -> [FilePath]) -> IO [FilePath]
-readFileList path fltr = do
-    l1 <- getDirectoryContents path
-    let l2 = fltr l1
-    let l3 = map (path </>) l2
-    return l3 
-
---readAppList :: FilePath -> ([FilePath] -> IO [FilePath]) -> IO [FilePath]
 readAppList :: FilePath -> IO [FilePath]
-readAppList path = do 
-    --f <-  getDirectoryContents path 
-    f <- listDirectory path 
-    fltrExec $ map (path </>) f
+readAppList path = listDirectory path >>= fltrExec . map (path </>) 
+
+filterMenu :: [MenuElement] -> IO [MenuElement]
+filterMenu [] = pure []
+filterMenu (x@(Item (MenuItem l ex)) : xs) = do
+            f <- isExec ex 
+            if f 
+               then  fmap (x :) (filterMenu xs) 
+               else filterMenu xs
 
 fltrExec :: [FilePath] -> IO [FilePath]
 fltrExec = filterM isExec 

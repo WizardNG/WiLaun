@@ -26,6 +26,7 @@ dependencies:
 - ghc
 - filepath
 - directory
+- extra
 
 library:
   source-dirs: src

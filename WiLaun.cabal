@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3b0d28d3b54f6b4e1e2c4a1f5ce3291fcfa77d99fb5c174aca374802abd09975
+-- hash: 7f377100ce4de811d37306c9ca91fd2d8497bdddd5aa18ccfeb116a99a8a5b20
 
 name:           WiLaun
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
   build-depends:
       base >=4.7 && <5
     , directory
+    , extra
     , filepath
     , ghc
     , libiserv
@@ -55,6 +56,7 @@ executable WiLaun-exe
       WiLaun
     , base >=4.7 && <5
     , directory
+    , extra
     , filepath
     , ghc
     , libiserv
@@ -73,6 +75,7 @@ test-suite WiLaun-test
       WiLaun
     , base >=4.7 && <5
     , directory
+    , extra
     , filepath
     , ghc
     , libiserv
