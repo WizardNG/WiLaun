@@ -10,7 +10,7 @@ import Control.Monad
 
 import System.Posix.Files
 import System.Posix.Types
-import System.FilePath.Posix
+--import System.FilePath.Posix
 import System.Posix.User
 
 isOwner :: FilePath -> IO Bool
