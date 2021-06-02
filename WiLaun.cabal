@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f377100ce4de811d37306c9ca91fd2d8497bdddd5aa18ccfeb116a99a8a5b20
+-- hash: 88e1bfcff398e31f80789907a6e9ad6ecd91596bc5f2e34eabf268eebb35369d
 
 name:           WiLaun
 version:        0.1.0.0
@@ -29,6 +29,7 @@ library
   exposed-modules:
       Execution
       FileControl
+      MenuTypes
       OpenMenu
       ReadMenu
   other-modules:
@@ -36,7 +37,8 @@ library
   hs-source-dirs:
       src
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base
     , directory
     , extra
     , filepath
@@ -54,7 +56,8 @@ executable WiLaun-exe
   ghc-options: -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       WiLaun
-    , base >=4.7 && <5
+    , aeson
+    , base
     , directory
     , extra
     , filepath
@@ -73,7 +76,8 @@ test-suite WiLaun-test
   ghc-options: -threaded -rtsopts -with-rtsopts=-N
   build-depends:
       WiLaun
-    , base >=4.7 && <5
+    , aeson
+    , base
     , directory
     , extra
     , filepath

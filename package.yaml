@@ -20,13 +20,14 @@ extra-source-files:
 description:         Please see the README on GitHub at <https://github.com/WizardNG/WiLaun#readme>
 
 dependencies:
-- base >= 4.7 && < 5
+- base 
 - unix
 - libiserv
 - ghc
 - filepath
 - directory
 - extra
+- aeson
 
 library:
   source-dirs: src

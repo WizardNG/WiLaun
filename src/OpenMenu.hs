@@ -3,6 +3,7 @@ module OpenMenu (
                )
                  where
 
+import MenuTypes
 import ReadMenu
 
 openMenu :: Menu -> String

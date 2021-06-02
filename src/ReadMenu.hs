@@ -4,49 +4,32 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
 
 module ReadMenu (
-                  MenuItem (..)
-                , Submenu (..)
-                , MenuElement (..)
-                , Menu (..)
-                , readMenu
+                  readMenu
                 , readSystemComponent
                 , readPath
                 , readSystemItems
                 ) where
 
---import System.IO
 import System.Posix.Env
 import System.Posix.Files
 import System.FilePath.Posix
 import System.Directory
 
---import Data.List 
---import Data.List.Extra
 import Data.Functor
---import Util
 import Control.Monad
 
+import Data.Aeson
+--import qualified Data.ByteString.Lazy.Internal.ByteString as B
+import qualified Data.ByteString.Lazy as B
+
 import FileControl
+import MenuTypes
 
--- | Type of elementary menu item 
-data MenuItem = MenuItem { name :: String
-                         , action :: String}
-                         deriving (Show, Eq)
-
--- | Type of menu sublevel
-data Submenu = Submenu { name :: String
-                       , sub :: Menu}
-                       deriving (Show, Eq)
-
--- | Type of base menu element: item or sublevel menu
-data MenuElement = Item MenuItem | SubLevel Submenu deriving (Show, Eq)
-
-newtype Menu = Menu [MenuElement] deriving (Show, Eq)
+menuFile :: FilePath
+menuFile = "~/.config/wilaun/menu"
 
 readMenu :: IO Menu
---readMenu = pure $ Menu []
-readMenu =  Menu <$> readSystemComponent  -- ++ readUserComponent
-
+readMenu =  Menu <$> ( (++) <$> readSystemComponent  <*> readUM) -- serComponent
 
 readSystemComponent :: IO [MenuElement]
 readSystemComponent = do
@@ -54,12 +37,6 @@ readSystemComponent = do
     pp <- filterM fileExist p
     l <- traverse readSystemItems pp 
     pure [SubLevel (Submenu "System"  $ Menu l )]
-
---readUserComponent :: [MenuElement]
---readUserComponent = [SubLevel  
-                            --(Submenu "User" (Menu 
-                                        --[Item (MenuItem "Telegram" "Telegram")]
-                      --))]
 
 readPath :: IO [FilePath]
 readPath = getEnv "PATH" <&> parsePath
@@ -70,16 +47,12 @@ parsePath (Just a) = splitSearchPath a
 
 readSystemItems :: FilePath -> IO MenuElement
 readSystemItems p = do 
-    ff <- liftM (map (p </>)) (listDirectory p) 
+    ff <- fmap (map (p </>)) (listDirectory p) 
     f <- filterM fileExist ff
     me <- filterMenu [Item $ MenuItem x (p </> x) | x<-f]
     pure $ SubLevel $ Submenu p (Menu me)
 
---readAppList :: FilePath -> IO [FilePath]
---readAppList path = listDirectory path >>= fltrExec . map (path </>) 
-
 filterMenu :: [MenuElement] -> IO [MenuElement]
---filterMenu [] = pure []
 filterMenu (x@(Item (MenuItem _ ex)) : xs) = do
             f <- isExec ex 
             if f 
@@ -87,5 +60,17 @@ filterMenu (x@(Item (MenuItem _ ex)) : xs) = do
                else filterMenu xs
 filterMenu x = pure x
 
---fltrExec :: [FilePath] -> IO [FilePath]
---fltrExec = filterM isExec 
+readUM :: IO [MenuElement]
+readUM = do
+    fm <- fileExist menuFile
+    if fm then do
+            f <- B.readFile menuFile
+            pure $ parseMenu (decode f :: Maybe Value)
+        else pure [] 
+
+parseMenu ::Maybe Value -> [MenuElement]
+parseMenu Nothing = []
+parseMenu (Just a) = parseME a
+
+parseME :: Value -> [MenuElement]
+parseME _ = []
