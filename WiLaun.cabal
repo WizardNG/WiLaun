@@ -1,87 +1,63 @@
-cabal-version: 1.12
+cabal-version:      2.4
+name:               WiLaun
+version:            0.1.0.0
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
---
--- see: https://github.com/sol/hpack
---
--- hash: 88e1bfcff398e31f80789907a6e9ad6ecd91596bc5f2e34eabf268eebb35369d
+-- A short (one-line) description of the package.
+-- synopsis:
 
-name:           WiLaun
-version:        0.1.0.0
+-- A longer description of the package.
+-- description:
+
+-- A URL where users can report bugs.
+-- bug-reports:
 description:    Please see the README on GitHub at <https://github.com/WizardNG/WiLaun#readme>
 homepage:       https://github.com/WizardNG/WiLaun#readme
 bug-reports:    https://github.com/WizardNG/WiLaun/issues
-author:         Kozlov Yury
-maintainer:     wizardng1@gmail.com
-copyright:      home
-license:        BSD3
-license-file:   LICENSE
-build-type:     Simple
+
+-- The license under which the package is released.
+-- license:
+author:             Kozlov
+maintainer:         wizardng1@gmail.com
+copyright:          home
+license:            BSD-3-Clause
+license-file:       LICENSE
+build-type:         Simple
+
+-- A copyright notice.
+-- copyright:
+-- category:
 extra-source-files:
-    README.md
-    ChangeLog.md
+        README.md
+        CHANGELOG.md
 
 source-repository head
   type: git
   location: https://github.com/WizardNG/WiLaun
 
-library
-  exposed-modules:
-      Execution
-      FileControl
-      MenuTypes
-      OpenMenu
-      ReadMenu
-  other-modules:
-      Paths_WiLaun
-  hs-source-dirs:
-      src
-  build-depends:
-      aeson
-    , base
-    , directory
-    , extra
-    , filepath
-    , ghc
-    , libiserv
-    , unix
-  default-language: Haskell2010
+executable WiLaun
+    main-is:          Main.hs
 
-executable WiLaun-exe
-  main-is: Main.hs
-  other-modules:
-      Paths_WiLaun
-  hs-source-dirs:
-      app
-  ghc-options: -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      WiLaun
-    , aeson
-    , base
-    , directory
-    , extra
-    , filepath
-    , ghc
-    , libiserv
-    , unix
-  default-language: Haskell2010
+    -- Modules included in this executable, other than Main.
+    other-modules:
+                      --Execution
+                      FileControl
+                      MenuTypes
+                      --OpenMenu
+                      ReadMenu
 
-test-suite WiLaun-test
-  type: exitcode-stdio-1.0
-  main-is: Spec.hs
-  other-modules:
-      Paths_WiLaun
-  hs-source-dirs:
-      test
-  ghc-options: -threaded -rtsopts -with-rtsopts=-N
-  build-depends:
-      WiLaun
-    , aeson
-    , base
-    , directory
-    , extra
-    , filepath
-    , ghc
-    , libiserv
-    , unix
-  default-language: Haskell2010
+    -- LANGUAGE extensions used by modules in this package.
+    -- other-extensions:
+    ghc-options: -Wall -Werror -O2 -threaded -rtsopts -with-rtsopts=-N
+
+    build-depends:    
+          base ^>=4.14.3.0
+        , aeson
+        , bytestring
+        , directory
+        , extra
+        , filepath
+        , ghc
+        , libiserv
+        , unix
+    hs-source-dirs:   app
+    default-language: Haskell2010

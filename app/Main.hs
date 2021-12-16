@@ -1,6 +1,6 @@
 module Main where
 
-import ReadMenu
+import ReadMenu(readMenu)
 --import OpenMenu
 --import Execution
 

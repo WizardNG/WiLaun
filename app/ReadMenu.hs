@@ -3,11 +3,13 @@
 {-# LANGUAGE DuplicateRecordFields #-}
 {-# LANGUAGE ConstrainedClassMethods #-}
 
-module ReadMenu (
-                  readMenu
+module ReadMenu ( readMenu
                 , readSystemComponent
                 , readPath
                 , readSystemItems
+                , readUM
+                , decoUM
+                , parseME
                 ) where
 
 import System.Posix.Env
@@ -19,6 +21,7 @@ import Data.Functor
 import Control.Monad
 
 import Data.Aeson
+import Data.Aeson.KeyMap (toList)
 --import qualified Data.ByteString.Lazy.Internal.ByteString as B
 import qualified Data.ByteString.Lazy as B
 
@@ -26,7 +29,10 @@ import FileControl
 import MenuTypes
 
 menuFile :: FilePath
-menuFile = "~/.config/wilaun/menu"
+--menuFile = "~/.config/wilaun/menu"
+menuFile = "/home/hask/conf/wilaun/menu"
+--menuFile = "~/conf/wilaun/menu"
+
 
 readMenu :: IO Menu
 readMenu =  Menu <$> ( (++) <$> readSystemComponent  <*> readUM) -- serComponent
@@ -67,10 +73,20 @@ readUM = do
             f <- B.readFile menuFile
             pure $ parseMenu (decode f :: Maybe Value)
         else pure [] 
+-- Tempore function. Delete after debuging
+decoUM :: IO [(Key, Value)]
+decoUM = do 
+            f <- B.readFile menuFile
+            let o = (decode f::Maybe Object)
+            let ll = maybe [] toList o
+            pure ll
 
 parseMenu ::Maybe Value -> [MenuElement]
 parseMenu Nothing = []
 parseMenu (Just a) = parseME a
 
 parseME :: Value -> [MenuElement]
+parseME (Array a) = if null a then []
+                                else [Item $ MenuItem "1" "2"]
+--parseME (Array a) = [parseMenu (Just x) | x <- a]                               
 parseME _ = []
