@@ -51,7 +51,8 @@ executable WiLaun
 
     build-depends:    
           base ^>=4.14.3.0
-        , aeson
+        --, aeson
+        , text
         , bytestring
         , directory
         , extra
@@ -59,5 +60,6 @@ executable WiLaun
         , ghc
         , libiserv
         , unix
+        , pretty-simple
     hs-source-dirs:   app
     default-language: Haskell2010

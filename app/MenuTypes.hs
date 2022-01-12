@@ -3,32 +3,33 @@
 {-# LANGUAGE ConstrainedClassMethods #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE MultiWayIf #-}
 
 module MenuTypes(
                   MenuItem (..)
                 , Submenu (..)
                 , MenuElement (..)
                 , Menu (..)
+                , makeMenu
                 )where 
 
 --import qualified    Data.ByteString as B
 --import              Control.Applicative((<*>), (<$>))
-import  Control.Monad (mzero)
+--import  Control.Monad (mzero)
 --import  GHC.List(length)
 import  GHC.Generics
-import  Data.Aeson
-import  Data.Aeson.KeyMap ( toList)
-import  Data.Aeson.Key( toString
-                      , fromString)
---import qualified    Data.Text.Internal as DT
+import qualified GHC.Base as B
+import qualified GHC.List as L
+import Data.Text
+import qualified Data.Bifunctor as DB 
 
 -- | Type of elementary menu item 
-data MenuItem = MenuItem { name :: String
-                         , action :: String}
+data MenuItem = MenuItem { name :: Text
+                         , action :: Text}
                          deriving (Generic, Show, Eq)
 
 -- | Type of menu sublevel
-data Submenu = Submenu { name :: String
+data Submenu = Submenu { name :: Text
                        , sub :: Menu}
                        deriving (Generic, Show, Eq)
 
@@ -38,48 +39,32 @@ data MenuElement = Item MenuItem | SubLevel Submenu deriving (Generic, Show, Eq)
 -- | Main type of menu
 newtype Menu = Menu [MenuElement] deriving (Generic, Show, Eq)
 
--- JSON instances from menu item
-instance FromJSON MenuItem where
-  parseJSON (Object m) = if length l /= 1 then mzero
-                                         else MenuItem n <$> m .: k 
-                                           where l = toList m
-                                                 k = fst $ head l
-                                                 n = toString k
-  parseJSON _ = mzero
-                                  
-instance ToJSON MenuItem where
-  toJSON (MenuItem n a) = object [fromString n .= a ]
+makeMenu :: Text -> Menu
+makeMenu t = Menu $ makeMEList $ Data.Text.lines t 
+
+makeMEList :: [Text] -> [MenuElement]
+makeMEList t = fst $ makeHelper t
+--makeMEList [] = []
+--makeMEList (x:xs) = makeME x : makeMEList xs
+
+makeHelper :: [Text] -> ([MenuElement], [Text])
+makeHelper [] = ([], [])
+makeHelper (τ:τσ) = if | t1=="]" -> ([], τσ)
+                       | t2 == "[" -> (DB.first (SubLevel (Submenu t1 (Menu τ')) :) (makeHelper τσ'))
+                       | (t1, t2) == ("","") -> (τ', τσ')
+                       | otherwise -> (DB.first (makeME τ :) (makeHelper τσ))
+    where (t1, t2) = parseStr τ
+          (τ', τσ') = makeHelper τσ
+
+parseStr :: Text -> (Text, Text)
+parseStr τ = if  | l==2 -> (L.head t, L.last t)
+                 | l==1 -> (L.head t, "")
+                 | otherwise -> ("","")
+                 where t = B.map strip $ splitOn ":" $ L.head $ splitOn "#" τ
+                       l = L.length t
 
 
--- JSON instances from submenu
-instance FromJSON Submenu where
-  parseJSON (Object m) = if length l /= 1 then mzero
-                                         else Submenu n <$> m .: k 
-                                           where l = toList m
-                                                 k = fst $ head l
-                                                 n = toString k
-  parseJSON _ = mzero
---
-instance ToJSON Submenu where 
-  toJSON (Submenu n s) = object [fromString n .= toJSON s]
-
-
--- JSON instances from  menu elements
-instance FromJSON MenuElement where
-  parseJSON _ = mzero
-
-instance ToJSON MenuElement where
-  toJSON (Item i) = toJSON i
-  toJSON (SubLevel s) = toJSON s
-
--- JSON instances from menu
-instance FromJSON Menu where
-  parseJSON (Object m) = if length l /= 1 then mzero
-                                         else Menu <$> m .: k 
-                                           where l = toList m
-                                                 k = fst $ head l
-  parseJSON _ = mzero
-
-instance ToJSON Menu where
-  toJSON (Menu m) =  toJSON $ fmap toJSON m
-
+makeME :: Text -> MenuElement
+--makeME x xs = Item $ MenuItem "1" "2"
+makeME σ = Item $ MenuItem φ λ
+                where (φ,λ) = parseStr σ 
