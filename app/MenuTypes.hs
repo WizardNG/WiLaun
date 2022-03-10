@@ -40,10 +40,11 @@ data MenuElement = Item MenuItem | SubLevel Submenu deriving (Generic, Show, Eq)
 newtype Menu = Menu [MenuElement] deriving (Generic, Show, Eq)
 
 makeMenu :: Text -> Menu
-makeMenu t = Menu $ makeMEList $ Data.Text.lines t 
+--makeMenu t = Menu $ makeMEList $ Data.Text.lines t 
+makeMenu = Menu . makeMEList . Data.Text.lines 
 
 makeMEList :: [Text] -> [MenuElement]
-makeMEList t = fst $ makeHelper t
+makeMEList = fst . makeHelper
 --makeMEList [] = []
 --makeMEList (x:xs) = makeME x : makeMEList xs
 

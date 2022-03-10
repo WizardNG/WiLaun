@@ -1,0 +1,53 @@
+
+app/Execution.hs,67
+module Execution Execution0,1
+executeCommand executeCommand5,6
+
+app/FileControl.hs,174
+module FileControl FileControl0,1
+isOwner isOwner15,16
+isGroup isGroup18,19
+checkMode checkMode21,22
+isExec isExec24,25
+isRead isRead35,36
+isWrite isWrite46,47
+
+app/Main.hs,37
+module Main Main0,1
+main main6,7
+
+app/MenuTypes.hs,629
+module MenuTypes(MenuTypes7,8
+data MenuItem MenuItem26,27
+data MenuItem = MenuItem MenuItem26,27
+data MenuItem = MenuItem { name name26,27
+                         , action action27,28
+data Submenu Submenu31,32
+data Submenu = Submenu Submenu31,32
+data Submenu = Submenu { name name31,32
+                       , sub sub32,33
+data MenuElement MenuElement36,37
+data MenuElement = Item Item36,37
+data MenuElement = Item MenuItem | SubLevel SubLevel36,37
+newtype Menu Menu39,40
+makeMenu makeMenu41,42
+makeMEList makeMEList45,46
+makeHelper makeHelper50,51
+parseStr parseStr59,60
+makeME makeME67,68
+
+app/OpenMenu.hs,53
+module OpenMenu OpenMenu0,1
+openMenu openMenu8,9
+
+app/ReadMenu.hs,289
+module ReadMenu ReadMenu6,7
+menuFile menuFile34,35
+readMenu readMenu40,41
+readSystemComponent readSystemComponent44,45
+readPath readPath51,52
+parsePath parsePath54,55
+readSystemItems readSystemItems58,59
+filterMenu filterMenu65,66
+readUM readUM73,74
+parseM parseM80,81
